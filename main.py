@@ -1,4 +1,4 @@
-from keep_alive import keep_alive  # Correct import
+from keep_alive import keep_alive  # Correct import to keep the bot alive via Flask
 from telethon import TelegramClient, events
 import os
 import asyncio
@@ -48,7 +48,7 @@ async def forward_message(event):
     # Custom message format with highlighted source message
     custom_message = f"""
 "{source_id_message}"
- 
+
  If the quoted text within double quotation mark is not a trading signal, respond with "Processing your question....". If it is a trading signal, extract the necessary information and fill out the form below. The symbol should be paired with USDT. Use the highest entry price. The stop loss price will be taken from inside the double quotation mark and if it is not given then calculate it as 0.5% below the entry price. Use the lowest take profit price given inside the double quoted message and if none is provided then calculate take profit price as 2% above the entry price.Provide only the completed form, no other text.[Remember inside the double quotation mark 'cmp'= current market price, 'sl'= stop loss, 'tp'=take profit]
 
 
@@ -78,7 +78,9 @@ async def main():
 
 # Entry point - running within the existing event loop
 if __name__ == "__main__":
-    keep_alive()  # Keep the bot alive
+    keep_alive()  # Start the Flask web server to keep the bot alive
+
+    # Loop to restart the script in case of error
     async def run_bot():
         while True:  # Loop to restart the script on error
             try:
