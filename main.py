@@ -1,33 +1,33 @@
-from keep_alive import keep_alive
-keep_alive()
+from keep_alive import keep_alive  # Correct import
 from telethon import TelegramClient, events
 import os
 import asyncio
 import traceback
+import config  # Import the config.py file
 
 # API credentials for source chat
-source_api_id = 26697231  # Replace with your first API ID
-source_api_hash = '35f2769c773534c6ebf24c9d0731703a'  # Replace with your first API Hash
-source_chat_id = -4564401074  # Replace with the chat ID to listen to
+SOURCE_API_ID = config.SOURCE_API_ID
+SOURCE_API_HASH = config.SOURCE_API_HASH
+SOURCE_CHAT_ID = config.SOURCE_CHAT_ID
 
 # API credentials for destination account
-destination_api_id = 14135677  # Replace with your second API ID
-destination_api_hash = 'edbecdc187df07fddb10bcff89964a8e'  # Replace with your second API Hash
-destination_bot_username = '@gpt3_unlim_chatbot'  # Replace with the bot's username
+DESTINATION_API_ID = config.DESTINATION_API_ID
+DESTINATION_API_HASH = config.DESTINATION_API_HASH
+DESTINATION_BOT_USERNAME = config.DESTINATION_BOT_USERNAME
 
 # Paths for session files
-source_session_file = "new10_source_session.session"
-destination_session_file = "new10_destination_session.session"
+SOURCE_SESSION_FILE = config.SOURCE_SESSION_FILE
+DESTINATION_SESSION_FILE = config.DESTINATION_SESSION_FILE
 
 # Ensure session files are present
-if not os.path.exists(source_session_file):
+if not os.path.exists(SOURCE_SESSION_FILE):
     print("Source session file not found. Creating a new session...")
-if not os.path.exists(destination_session_file):
+if not os.path.exists(DESTINATION_SESSION_FILE):
     print("Destination session file not found. Creating a new session...")
 
 # Initialize Telegram clients
-source_client = TelegramClient(source_session_file, source_api_id, source_api_hash)
-destination_client = TelegramClient(destination_session_file, destination_api_id, destination_api_hash)
+source_client = TelegramClient(SOURCE_SESSION_FILE, SOURCE_API_ID, SOURCE_API_HASH)
+destination_client = TelegramClient(DESTINATION_SESSION_FILE, DESTINATION_API_ID, DESTINATION_API_HASH)
 
 # Function to handle disconnections and reconnections
 async def handle_disconnection():
@@ -40,7 +40,7 @@ async def handle_disconnection():
             await source_client.start()  # Restart the client
 
 # Event handler for messages in the source chat
-@source_client.on(events.NewMessage(chats=source_chat_id))
+@source_client.on(events.NewMessage(chats=SOURCE_CHAT_ID))
 async def forward_message(event):
     # Extract the original message
     source_id_message = event.raw_text
@@ -62,7 +62,7 @@ Take Profit:
     # Send the formatted message to the bot
     async with destination_client:
         try:
-            await destination_client.send_message(destination_bot_username, custom_message)
+            await destination_client.send_message(DESTINATION_BOT_USERNAME, custom_message)
             print("Custom message forwarded to destination bot.")
         except Exception as e:
             print(f"Error while forwarding the message: {e}")
@@ -78,6 +78,7 @@ async def main():
 
 # Entry point - running within the existing event loop
 if __name__ == "__main__":
+    keep_alive()  # Keep the bot alive
     async def run_bot():
         while True:  # Loop to restart the script on error
             try:
